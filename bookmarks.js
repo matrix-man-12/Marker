@@ -38,7 +38,8 @@ function renderBookmarks() {
     }
 
     grid.innerHTML = filteredBookmarks.map(b => `
-    <div class="bookmark-card" data-id="${b.id}">
+    <div class="bookmark-card ${b.watched ? 'watched' : ''}" data-id="${b.id}">
+      <input type="checkbox" class="bookmark-checkbox" data-id="${b.id}">
       <div class="thumbnail">
         <img src="https://i.ytimg.com/vi/${b.video_id}/mqdefault.jpg" alt="${escapeHtml(b.video_title)}">
       </div>
@@ -46,14 +47,22 @@ function renderBookmarks() {
       <div class="meta">📺 ${escapeHtml(b.channel_name)}</div>
       <div class="meta">📅 ${formatDate(b.created_at)}</div>
       <div class="timestamp-badge">⏱️ ${b.timestamp_hh_mm_ss}</div>
+      <button class="watch-toggle-btn ${b.watched ? 'watched' : ''}" data-id="${b.id}" title="${b.watched ? 'Mark as unwatched' : 'Mark as watched'}">
+        ${b.watched ? '✓' : '👁️'}
+      </button>
       <button class="delete-btn" data-id="${b.id}">Delete</button>
     </div>
   `).join('');
 
-    // Add click handlers
+    // Add click handlers for opening videos
     document.querySelectorAll('.bookmark-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) return;
+            // Don't open if clicking checkbox, buttons
+            if (e.target.classList.contains('bookmark-checkbox') ||
+                e.target.classList.contains('delete-btn') ||
+                e.target.classList.contains('watch-toggle-btn')) {
+                return;
+            }
             const bookmark = filteredBookmarks.find(b => b.id === card.dataset.id);
             if (bookmark) {
                 window.open(bookmark.video_url, '_blank');
@@ -71,11 +80,98 @@ function renderBookmarks() {
             }
         });
     });
+
+    // Add watch toggle handlers
+    document.querySelectorAll('.watch-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            await toggleWatched(id);
+        });
+    });
+
+    // Add checkbox change handlers
+    document.querySelectorAll('.bookmark-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedCount);
+    });
 }
 
 // Delete a bookmark
 async function deleteBookmark(id) {
     allBookmarks = allBookmarks.filter(b => b.id !== id);
+    await chrome.storage.local.set({ bookmarks: allBookmarks });
+    await loadBookmarks();
+    applyFilters();
+}
+
+// Toggle watched status
+async function toggleWatched(id) {
+    const bookmark = allBookmarks.find(b => b.id === id);
+    if (bookmark) {
+        bookmark.watched = !bookmark.watched;
+        await chrome.storage.local.set({ bookmarks: allBookmarks });
+        await loadBookmarks();
+        applyFilters();
+    }
+}
+
+// Update selected count
+function updateSelectedCount() {
+    const selectedCheckboxes = document.querySelectorAll('.bookmark-checkbox:checked');
+    const count = selectedCheckboxes.length;
+    document.getElementById('selectedCount').textContent = count;
+
+    // Show/hide bulk actions bar
+    const bulkActionsBar = document.getElementById('bulkActions');
+    bulkActionsBar.style.display = count > 0 ? 'flex' : 'none';
+}
+
+// Get selected bookmark IDs
+function getSelectedIds() {
+    const selectedCheckboxes = document.querySelectorAll('.bookmark-checkbox:checked');
+    return Array.from(selectedCheckboxes).map(cb => cb.dataset.id);
+}
+
+// Bulk mark as watched
+async function bulkMarkWatched() {
+    const selectedIds = getSelectedIds();
+    if (selectedIds.length === 0) return;
+
+    selectedIds.forEach(id => {
+        const bookmark = allBookmarks.find(b => b.id === id);
+        if (bookmark) bookmark.watched = true;
+    });
+
+    await chrome.storage.local.set({ bookmarks: allBookmarks });
+    await loadBookmarks();
+    applyFilters();
+}
+
+// Bulk mark as unwatched
+async function bulkMarkUnwatched() {
+    const selectedIds = getSelectedIds();
+    if (selectedIds.length === 0) return;
+
+    selectedIds.forEach(id => {
+        const bookmark = allBookmarks.find(b => b.id === id);
+        if (bookmark) bookmark.watched = false;
+    });
+
+    await chrome.storage.local.set({ bookmarks: allBookmarks });
+    await loadBookmarks();
+    applyFilters();
+}
+
+// Bulk delete
+async function bulkDelete() {
+    const selectedIds = getSelectedIds();
+    if (selectedIds.length === 0) return;
+
+    if (!confirm(`Delete ${selectedIds.length} selected bookmarks?`)) {
+        return;
+    }
+
+    allBookmarks = allBookmarks.filter(b => !selectedIds.includes(b.id));
     await chrome.storage.local.set({ bookmarks: allBookmarks });
     await loadBookmarks();
     applyFilters();
@@ -285,6 +381,18 @@ document.getElementById('importFile').addEventListener('change', (e) => {
         importFromCSV(file);
     }
 });
+
+// Select all checkbox
+document.getElementById('selectAll').addEventListener('change', (e) => {
+    const checkboxes = document.querySelectorAll('.bookmark-checkbox');
+    checkboxes.forEach(cb => cb.checked = e.target.checked);
+    updateSelectedCount();
+});
+
+// Bulk action buttons
+document.getElementById('markWatchedBtn').addEventListener('click', bulkMarkWatched);
+document.getElementById('markUnwatchedBtn').addEventListener('click', bulkMarkUnwatched);
+document.getElementById('bulkDeleteBtn').addEventListener('click', bulkDelete);
 
 // Listen for storage changes (real-time sync across tabs)
 chrome.storage.onChanged.addListener((changes, areaName) => {

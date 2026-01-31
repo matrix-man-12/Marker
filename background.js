@@ -23,6 +23,7 @@ async function saveBookmark(bookmarkData) {
         // Create bookmark with unique ID
         const bookmark = {
             id: generateUUID(),
+            watched: false,  // Track watched status
             ...bookmarkData
         };
 

@@ -142,10 +142,56 @@
             position: relative;
         }
 
+        .bookmark-card.watched {
+            opacity: 0.6;
+            filter: grayscale(50%);
+        }
+
+        .bookmark-card.watched::after {
+            content: '✓ WATCHED';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 200, 0, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
         .bookmark-card:hover {
             border-color: #667eea;
             transform: translateY(-4px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .bookmark-checkbox {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 12px;
+            padding: 15px 20px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .bulk-actions::before {
+            content: '⚡';
+            font-size: 20px;
+            margin-right: 8px;
         }
 
         .bookmark-card .thumbnail {
@@ -221,6 +267,38 @@
             transform: none;
         }
 
+        .watch-toggle-btn {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 5;
+        }
+
+        .bookmark-card:hover .watch-toggle-btn {
+            opacity: 1;
+        }
+
+        .watch-toggle-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .watch-toggle-btn.watched {
+            opacity: 1;
+            background: rgba(0, 200, 0, 0.1);
+            color: #00c800;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -258,8 +336,15 @@
         </div>
 
         <div class="stats-bar">
+            <div class="stat">
+                <label style="cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="selectAll" style="margin-right: 5px;">
+                    Select All
+                </label>
+            </div>
             <div class="stat">Total: <span class="stat-value" id="totalCount">0</span></div>
             <div class="stat">Showing: <span class="stat-value" id="showingCount">0</span></div>
+            <div class="stat">Selected: <span class="stat-value" id="selectedCount">0</span></div>
             <div style="flex: 1"></div>
             <div class="sort-controls">
                 <label for="sortBy">Sort by:</label>
@@ -270,6 +355,12 @@
                     <option value="channel">Channel A-Z</option>
                 </select>
             </div>
+        </div>
+
+        <div id="bulkActions" class="bulk-actions" style="display: none;">
+            <button id="markWatchedBtn">👁️ Mark as Watched</button>
+            <button id="markUnwatchedBtn">👁️‍🗨️ Mark as Unwatched</button>
+            <button id="bulkDeleteBtn" class="danger">🗑️ Delete Selected</button>
         </div>
 
         <div id="bookmarksGrid" class="bookmarks-grid"></div>
