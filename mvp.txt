@@ -1,0 +1,226 @@
+MVP: YouTube Bookmarking Chrome Extension (CSV-based)
+1. Product Overview (MVP Scope)
+
+Purpose
+A local Chrome extension that allows users to bookmark the currently playing YouTube video and timestamp using a keyboard shortcut and persist bookmarks in a user-selected CSV file.
+
+Target user
+Individual users who want lightweight, offline-friendly bookmarking of YouTube videos without cloud sync.
+
+Distribution
+
+Unpacked / local usage (initially)
+
+Designed to be Chrome Web Store compliant
+
+2. Core User Flow (End-to-End)
+First-time setup
+
+User installs extension
+
+User opens any YouTube video
+
+User presses Ctrl + Shift + L
+
+Extension prompts user to:
+
+Create a new CSV file or
+
+Select an existing CSV file
+
+User approves file access via Chrome file picker
+
+Normal usage
+
+User watches YouTube
+
+At any time, presses Ctrl + Shift + L
+
+Extension captures:
+
+Video metadata
+
+Current playback timestamp
+
+Bookmark is automatically appended to the selected CSV file
+
+No UI popup, no additional prompts
+
+3. Functional Requirements (MVP)
+FR-1: Keyboard Shortcut
+
+Shortcut: Ctrl + Shift + L
+
+Scope: Active tab only
+
+Behavior:
+
+Works only on youtube.com
+
+Ignored on other domains
+
+FR-2: Bookmark Capture
+
+On shortcut trigger, capture:
+
+Video ID
+
+Video title
+
+Channel name
+
+Current playback time (seconds)
+
+Human-readable timestamp (HH:MM:SS)
+
+Full video URL with timestamp
+
+Bookmark creation date-time (ISO)
+
+FR-3: CSV Persistence
+
+Format: CSV
+
+File is selected explicitly by the user
+
+CSV header written once
+
+Each bookmark appended as a new row
+
+Duplicate detection (MVP rule):
+
+Same video_id + timestamp_seconds → ignore
+
+FR-4: File Access Approval
+
+Uses File System Access API
+
+Triggered only by user gesture
+
+File handle stored securely
+
+Permission re-checked before every write
+
+If permission revoked → prompt user again
+
+FR-5: Offline-First
+
+No network calls
+
+No external APIs
+
+No cloud sync
+
+Works entirely locally
+
+4. Non-Goals (Explicitly Out of Scope)
+
+❌ No account system
+❌ No backend / server
+❌ No syncing across devices
+❌ No automatic background writing without user consent
+❌ No analytics or tracking
+
+5. Architecture (MVP)
+Components
+1. Content Script (YouTube-only)
+
+Injected on https://www.youtube.com/*
+
+Responsibilities:
+
+Read current video metadata
+
+Read playback timestamp
+
+Listen for shortcut signal
+
+2. Background Service Worker (MV3)
+
+Central coordinator
+
+Responsibilities:
+
+Receive bookmark event
+
+De-duplicate bookmarks
+
+Serialize CSV row
+
+Manage file handle
+
+Perform file writes
+
+3. Storage Layer
+
+chrome.storage.local
+
+Persist file handle
+
+Cache bookmarks (failsafe)
+
+4. File Writing
+
+File System Access API
+
+Write strategy:
+
+Open writable stream
+
+Append new row
+
+Close stream immediately
+
+6. CSV Schema (MVP)
+Column	Description
+video_id	YouTube video ID
+video_title	Video title
+channel_name	Channel name
+timestamp_seconds	Playback time (seconds)
+timestamp_hh_mm_ss	Human-readable time
+video_url	URL with timestamp
+created_at	ISO datetime
+7. Permissions (Minimal & Justified)
+Permission	Reason
+activeTab	Read current YouTube page
+scripting	Inject content script
+storage	Store file handle & cache
+commands	Keyboard shortcut
+fileSystemAccess	User-approved CSV writing
+8. Privacy & Security Statement (Reviewer-ready)
+
+No data leaves the user’s machine
+
+No analytics or tracking
+
+No network requests
+
+File access limited strictly to the user-selected file
+
+User can revoke permission at any time via Chrome settings
+
+9. Failure Handling
+Scenario	Behavior
+File permission revoked	Prompt file picker again
+File deleted	Ask user to reselect
+Duplicate bookmark	Ignore silently
+Non-YouTube page	No action
+Shortcut conflict	User can rebind shortcut
+10. UX Principles (MVP)
+
+Zero UI interruptions during normal use
+
+One-time explicit consent
+
+Keyboard-first workflow
+
+Transparent and reversible permissions
+
+11. MVP Acceptance Criteria
+
+✅ Bookmark added with one shortcut
+✅ CSV auto-updates correctly
+✅ No silent file access
+✅ No crashes on permission loss
+✅ Works offline
+✅ Chrome security compliant
