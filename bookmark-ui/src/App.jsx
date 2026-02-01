@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { StatsBar } from './components/StatsBar';
 import { BookmarkGrid } from './components/BookmarkGrid';
 import { BulkActionBar } from './components/BulkActionBar';
+import { ConfirmModal } from './components/ConfirmModal';
 import { useBookmarks } from './hooks/useBookmarks';
 import { exportToCSV, parseCSV } from './utils/csv';
 import './App.css';
@@ -26,11 +27,25 @@ function App() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
 
+  // Modal state
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: '',
+    onConfirm: null,
+    variant: 'danger'
+  });
+
   // Set initial theme on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('yt-bookmark-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
+
+  const closeModal = () => {
+    setModalConfig(prev => ({ ...prev, isOpen: false }));
+  };
 
   // Clear selection when exiting selection mode
   const handleToggleSelectionMode = () => {
@@ -64,10 +79,35 @@ function App() {
     setSelectionMode(false);
   };
 
-  const handleBulkDelete = async () => {
-    await bulkDelete(Array.from(selectedIds));
-    setSelectedIds(new Set());
-    setSelectionMode(false);
+  const handleBulkDeleteRequest = () => {
+    const count = selectedIds.size;
+    setModalConfig({
+      isOpen: true,
+      title: 'Delete Bookmarks',
+      message: `Are you sure you want to delete ${count} bookmark${count > 1 ? 's' : ''}? This action cannot be undone.`,
+      confirmText: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        await bulkDelete(Array.from(selectedIds));
+        setSelectedIds(new Set());
+        setSelectionMode(false);
+        closeModal();
+      }
+    });
+  };
+
+  const handleSingleDeleteRequest = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: 'Delete Bookmark',
+      message: 'Are you sure you want to delete this bookmark? This action cannot be undone.',
+      confirmText: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        await deleteBookmark(id);
+        closeModal();
+      }
+    });
   };
 
   const handleCancelSelection = () => {
@@ -121,7 +161,7 @@ function App() {
 
         <BookmarkGrid
           bookmarks={filteredBookmarks}
-          onDelete={deleteBookmark}
+          onDelete={handleSingleDeleteRequest}
           selectionMode={selectionMode}
           selectedIds={selectedIds}
           onSelect={handleSelect}
@@ -133,10 +173,20 @@ function App() {
           selectedCount={selectedIds.size}
           onMarkWatched={handleBulkMarkWatched}
           onMarkUnwatched={handleBulkMarkUnwatched}
-          onDelete={handleBulkDelete}
+          onDelete={handleBulkDeleteRequest}
           onCancel={handleCancelSelection}
         />
       )}
+
+      <ConfirmModal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        confirmText={modalConfig.confirmText}
+        variant={modalConfig.variant}
+        onConfirm={modalConfig.onConfirm}
+        onCancel={closeModal}
+      />
     </div>
   );
 }

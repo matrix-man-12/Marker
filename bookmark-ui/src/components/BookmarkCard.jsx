@@ -70,9 +70,7 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
 
     const handleDelete = (e) => {
         e.stopPropagation();
-        if (window.confirm('Delete this bookmark?')) {
-            onDelete?.(bookmark.id);
-        }
+        onDelete?.(bookmark.id);
     };
 
     const handleCheckboxClick = (e) => {
