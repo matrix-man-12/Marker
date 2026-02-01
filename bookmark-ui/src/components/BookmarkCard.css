@@ -118,6 +118,7 @@
 .card-channel {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
     padding-bottom: var(--spacing-xs);
@@ -168,12 +169,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 120px;
-}
-
-.channel-separator {
-    color: var(--text-muted);
-    font-size: 12px;
+    max-width: 165px;
 }
 
 .card-date {
@@ -196,7 +192,8 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 40px;
+    height: 50px;
+    overflow-y: hidden;
     word-break: break-word;
 }
 

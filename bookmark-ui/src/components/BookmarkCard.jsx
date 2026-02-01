@@ -142,7 +142,6 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
                     </div>
                     <span className="channel-name">{bookmark.channel_name}</span>
                 </div>
-                <span className="channel-separator">•</span>
                 <span className="card-date">{formatRelativeTime(bookmark.created_at)}</span>
             </div>
 
