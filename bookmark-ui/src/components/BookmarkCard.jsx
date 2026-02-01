@@ -44,7 +44,7 @@ function formatDuration(seconds) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-export function BookmarkCard({ bookmark, onDelete }) {
+export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, onSelect }) {
     const thumbnailUrl = `https://i.ytimg.com/vi/${bookmark.video_id}/mqdefault.jpg`;
 
     // URL without timestamp - starts video from beginning
@@ -55,11 +55,17 @@ export function BookmarkCard({ bookmark, onDelete }) {
 
     const handleTimestampClick = (e) => {
         e.stopPropagation();
-        window.open(videoUrlWithTimestamp, '_blank');
+        if (!selectionMode) {
+            window.open(videoUrlWithTimestamp, '_blank');
+        }
     };
 
     const handleCardClick = () => {
-        window.open(videoUrlFromStart, '_blank');
+        if (selectionMode) {
+            onSelect?.(bookmark.id);
+        } else {
+            window.open(videoUrlFromStart, '_blank');
+        }
     };
 
     const handleDelete = (e) => {
@@ -69,11 +75,35 @@ export function BookmarkCard({ bookmark, onDelete }) {
         }
     };
 
+    const handleCheckboxClick = (e) => {
+        e.stopPropagation();
+        onSelect?.(bookmark.id);
+    };
+
     // Duration to show on thumbnail - use video duration if available, otherwise use bookmark timestamp
     const thumbnailDuration = bookmark.video_duration_seconds || bookmark.timestamp_seconds;
 
+    const cardClasses = [
+        'bookmark-card',
+        selectionMode && 'selection-mode',
+        isSelected && 'selected'
+    ].filter(Boolean).join(' ');
+
     return (
-        <article className="bookmark-card" onClick={handleCardClick}>
+        <article className={cardClasses} onClick={handleCardClick}>
+            {/* Selection Checkbox */}
+            {selectionMode && (
+                <div className="card-checkbox" onClick={handleCheckboxClick}>
+                    <div className={`checkbox ${isSelected ? 'checked' : ''}`}>
+                        {isSelected && (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Thumbnail */}
             <div className="card-thumbnail">
                 <img src={thumbnailUrl} alt={bookmark.video_title} loading="lazy" />
@@ -105,14 +135,16 @@ export function BookmarkCard({ bookmark, onDelete }) {
                     {bookmark.timestamp_hh_mm_ss}
                 </button>
 
-                <button className="delete-btn" onClick={handleDelete} title="Delete bookmark">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                </button>
+                {!selectionMode && (
+                    <button className="delete-btn" onClick={handleDelete} title="Delete bookmark">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                )}
             </div>
         </article>
     );

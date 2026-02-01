@@ -128,6 +128,22 @@ export function useBookmarks() {
         return { imported: uniqueNew.length, message: `Imported ${uniqueNew.length} new bookmarks!` };
     }, [bookmarks, saveBookmarks]);
 
+    // Bulk set watched status for multiple bookmarks
+    const bulkSetWatched = useCallback(async (ids, watched) => {
+        const idSet = new Set(ids);
+        const newBookmarks = bookmarks.map(b =>
+            idSet.has(b.id) ? { ...b, watched } : b
+        );
+        await saveBookmarks(newBookmarks);
+    }, [bookmarks, saveBookmarks]);
+
+    // Bulk delete multiple bookmarks
+    const bulkDelete = useCallback(async (ids) => {
+        const idSet = new Set(ids);
+        const newBookmarks = bookmarks.filter(b => !idSet.has(b.id));
+        await saveBookmarks(newBookmarks);
+    }, [bookmarks, saveBookmarks]);
+
     return {
         bookmarks,
         filteredBookmarks,
@@ -139,6 +155,8 @@ export function useBookmarks() {
         deleteBookmark,
         toggleWatched,
         importBookmarks,
+        bulkSetWatched,
+        bulkDelete,
         reload: loadBookmarks
     };
 }

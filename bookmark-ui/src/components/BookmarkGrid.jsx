@@ -1,7 +1,7 @@
 import { BookmarkCard } from './BookmarkCard';
 import './BookmarkGrid.css';
 
-export function BookmarkGrid({ bookmarks, onDelete }) {
+export function BookmarkGrid({ bookmarks, onDelete, selectionMode, selectedIds, onSelect }) {
     if (bookmarks.length === 0) {
         return (
             <div className="empty-state">
@@ -25,6 +25,9 @@ export function BookmarkGrid({ bookmarks, onDelete }) {
                     key={bookmark.id}
                     bookmark={bookmark}
                     onDelete={onDelete}
+                    selectionMode={selectionMode}
+                    isSelected={selectedIds.has(bookmark.id)}
+                    onSelect={onSelect}
                 />
             ))}
         </div>

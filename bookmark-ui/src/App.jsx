@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { StatsBar } from './components/StatsBar';
 import { BookmarkGrid } from './components/BookmarkGrid';
+import { BulkActionBar } from './components/BulkActionBar';
 import { useBookmarks } from './hooks/useBookmarks';
 import { exportToCSV, parseCSV } from './utils/csv';
 import './App.css';
@@ -16,14 +17,63 @@ function App() {
     sortOption,
     setSortOption,
     deleteBookmark,
-    importBookmarks
+    importBookmarks,
+    bulkSetWatched,
+    bulkDelete
   } = useBookmarks();
+
+  // Selection state
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   // Set initial theme on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('yt-bookmark-theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
+
+  // Clear selection when exiting selection mode
+  const handleToggleSelectionMode = () => {
+    if (selectionMode) {
+      setSelectedIds(new Set());
+    }
+    setSelectionMode(!selectionMode);
+  };
+
+  const handleSelect = (id) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleBulkMarkWatched = async () => {
+    await bulkSetWatched(Array.from(selectedIds), true);
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
+
+  const handleBulkMarkUnwatched = async () => {
+    await bulkSetWatched(Array.from(selectedIds), false);
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
+
+  const handleBulkDelete = async () => {
+    await bulkDelete(Array.from(selectedIds));
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
+
+  const handleCancelSelection = () => {
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
 
   const handleExport = () => {
     exportToCSV(bookmarks);
@@ -65,13 +115,28 @@ function App() {
           showing={filteredBookmarks.length}
           sortOption={sortOption}
           onSortChange={setSortOption}
+          selectionMode={selectionMode}
+          onToggleSelectionMode={handleToggleSelectionMode}
         />
 
         <BookmarkGrid
           bookmarks={filteredBookmarks}
           onDelete={deleteBookmark}
+          selectionMode={selectionMode}
+          selectedIds={selectedIds}
+          onSelect={handleSelect}
         />
       </main>
+
+      {selectionMode && (
+        <BulkActionBar
+          selectedCount={selectedIds.size}
+          onMarkWatched={handleBulkMarkWatched}
+          onMarkUnwatched={handleBulkMarkUnwatched}
+          onDelete={handleBulkDelete}
+          onCancel={handleCancelSelection}
+        />
+      )}
     </div>
   );
 }

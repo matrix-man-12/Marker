@@ -27,6 +27,30 @@
 .stats-right {
     display: flex;
     align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.select-btn {
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.select-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.select-btn.active {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
 }
 
 @media (max-width: 600px) {

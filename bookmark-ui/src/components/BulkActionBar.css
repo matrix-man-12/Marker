@@ -1,0 +1,130 @@
+.bulk-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.bulk-action-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.selected-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--accent-primary);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    color: white;
+}
+
+.bulk-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.bulk-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.bulk-btn:hover {
+    background: var(--bg-card-hover);
+}
+
+.bulk-btn-watched {
+    border-color: #22c55e;
+    color: #22c55e;
+}
+
+.bulk-btn-watched:hover {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.bulk-btn-unwatched {
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.bulk-btn-unwatched:hover {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.bulk-btn-delete {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.bulk-btn-delete:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.bulk-btn-cancel {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-secondary);
+}
+
+.bulk-btn-cancel:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .bulk-action-bar {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .bulk-action-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .bulk-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .bulk-btn span {
+        display: none;
+    }
+}
