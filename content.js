@@ -50,6 +50,36 @@ function getChannelName() {
 }
 
 /**
+ * Get channel URL from page
+ * @returns {string|null} - Channel URL or null if not found
+ */
+function getChannelUrl() {
+    const channelLink =
+        document.querySelector('ytd-video-owner-renderer ytd-channel-name a') ||
+        document.querySelector('ytd-video-owner-renderer a#avatar') ||
+        document.querySelector('#owner ytd-channel-name a') ||
+        document.querySelector('#channel-name a');
+
+    return channelLink ? channelLink.href : null;
+}
+
+/**
+ * Get channel avatar URL from page
+ * @returns {string|null} - Channel avatar URL or null if not found
+ */
+function getChannelAvatarUrl() {
+    // Try multiple selectors - YouTube's DOM can vary
+    const avatarElement =
+        document.querySelector('ytd-video-owner-renderer #avatar img') ||
+        document.querySelector('#owner #avatar img') ||
+        document.querySelector('ytd-video-owner-renderer a#avatar img') ||
+        document.querySelector('ytd-video-owner-renderer yt-img-shadow img') ||
+        document.querySelector('#owner yt-img-shadow img');
+
+    return avatarElement ? avatarElement.src : null;
+}
+
+/**
  * Get current playback timestamp from video player
  * @returns {number|null} - Current time in seconds, or null if video not found
  */
@@ -88,6 +118,8 @@ function extractVideoMetadata() {
 
     const videoTitle = getVideoTitle();
     const channelName = getChannelName();
+    const channelUrl = getChannelUrl();
+    const channelAvatar = getChannelAvatarUrl();
     const timestampFormatted = formatTimestamp(timestampSeconds);
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}&t=${timestampSeconds}s`;
     const createdAt = formatISODateTime();
@@ -97,6 +129,8 @@ function extractVideoMetadata() {
         video_id: videoId,
         video_title: videoTitle,
         channel_name: channelName,
+        channel_url: channelUrl,
+        channel_avatar: channelAvatar,
         timestamp_seconds: timestampSeconds,
         timestamp_hh_mm_ss: timestampFormatted,
         video_url: videoUrl,

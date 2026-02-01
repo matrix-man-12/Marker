@@ -60,6 +60,13 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
         }
     };
 
+    const handleChannelClick = (e) => {
+        e.stopPropagation();
+        if (!selectionMode && bookmark.channel_url) {
+            window.open(bookmark.channel_url, '_blank');
+        }
+    };
+
     const handleCardClick = () => {
         if (selectionMode) {
             onSelect?.(bookmark.id);
@@ -119,12 +126,22 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
 
             {/* Channel Info */}
             <div className="card-channel">
-                <div className="channel-avatar">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                    </svg>
+                <div
+                    className={`channel-link ${bookmark.channel_url ? 'clickable' : ''}`}
+                    onClick={handleChannelClick}
+                    title={bookmark.channel_url ? 'Visit channel' : ''}
+                >
+                    <div className="channel-avatar">
+                        {bookmark.channel_avatar ? (
+                            <img src={bookmark.channel_avatar} alt={bookmark.channel_name} />
+                        ) : (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                            </svg>
+                        )}
+                    </div>
+                    <span className="channel-name">{bookmark.channel_name}</span>
                 </div>
-                <span className="channel-name">{bookmark.channel_name}</span>
                 <span className="channel-separator">•</span>
                 <span className="card-date">{formatRelativeTime(bookmark.created_at)}</span>
             </div>
