@@ -48,7 +48,7 @@ function escapeHtml(text) {
 
 // View all bookmarks
 document.getElementById('viewAllBtn').addEventListener('click', () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL('bookmarks.html') });
+    chrome.tabs.create({ url: chrome.runtime.getURL('bookmarks-page/index.html') });
 });
 
 // Export to CSV

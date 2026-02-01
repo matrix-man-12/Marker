@@ -59,6 +59,15 @@ function getCurrentTimestamp() {
 }
 
 /**
+ * Get total video duration from video player
+ * @returns {number|null} - Duration in seconds, or null if video not found
+ */
+function getVideoDuration() {
+    const video = document.querySelector('video');
+    return video && video.duration ? Math.floor(video.duration) : null;
+}
+
+/**
  * Extract all video metadata and create bookmark object
  * @returns {Object|null} - Bookmark data or null if extraction fails
  */
@@ -82,6 +91,7 @@ function extractVideoMetadata() {
     const timestampFormatted = formatTimestamp(timestampSeconds);
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}&t=${timestampSeconds}s`;
     const createdAt = formatISODateTime();
+    const videoDuration = getVideoDuration();
 
     return {
         video_id: videoId,
@@ -90,7 +100,8 @@ function extractVideoMetadata() {
         timestamp_seconds: timestampSeconds,
         timestamp_hh_mm_ss: timestampFormatted,
         video_url: videoUrl,
-        created_at: createdAt
+        created_at: createdAt,
+        video_duration_seconds: videoDuration
     };
 }
 
