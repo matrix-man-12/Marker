@@ -36,6 +36,13 @@
         "mac": "Command+Shift+L"
       },
       "description": "Bookmark current YouTube video at current timestamp"
+    },
+    "remove-bookmark": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
+      },
+      "description": "Remove bookmark for current YouTube video"
     }
   },
   "icons": {

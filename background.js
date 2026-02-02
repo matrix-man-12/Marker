@@ -56,23 +56,56 @@ async function saveBookmark(bookmarkData) {
         return { success: false, error: error.message };
     }
 }
+/**
+ * Remove bookmark(s) for a specific video ID
+ * @param {string} videoId - Video ID to remove bookmarks for
+ * @returns {Promise<Object>} - Result object
+ */
+async function removeBookmarkByVideoId(videoId) {
+    try {
+        const result = await chrome.storage.local.get('bookmarks');
+        const bookmarks = result.bookmarks || [];
+
+        const originalCount = bookmarks.length;
+        const newBookmarks = bookmarks.filter(b => b.video_id !== videoId);
+        const removedCount = originalCount - newBookmarks.length;
+
+        if (removedCount === 0) {
+            console.log('[YT Bookmarker] No bookmarks found for this video');
+            return { success: true, removed: 0 };
+        }
+
+        await chrome.storage.local.set({ bookmarks: newBookmarks });
+        console.log(`[YT Bookmarker] Removed ${removedCount} bookmark(s) for video: ${videoId}`);
+        return { success: true, removed: removedCount };
+
+    } catch (error) {
+        console.error('[YT Bookmarker] Error removing bookmark:', error);
+        return { success: false, error: error.message };
+    }
+}
 
 // Listen for keyboard shortcuts
 chrome.commands.onCommand.addListener(async (command) => {
+    // Get active tab
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    if (!tab || !tab.url || !tab.url.includes('youtube.com')) {
+        console.log('[YT Bookmarker] Not on YouTube page');
+        return;
+    }
+
     if (command === 'bookmark-video') {
-        console.log('[YT Bookmarker] Keyboard shortcut triggered');
-
-        // Get active tab
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-        if (!tab || !tab.url || !tab.url.includes('youtube.com')) {
-            console.log('[YT Bookmarker] Not on YouTube page');
-            return;
-        }
-
-        // Send message to content script to extract metadata
+        console.log('[YT Bookmarker] Bookmark shortcut triggered');
         try {
             await chrome.tabs.sendMessage(tab.id, { action: 'trigger-bookmark' });
+        } catch (error) {
+            console.error('[YT Bookmarker] Error sending message to content script:', error);
+        }
+    } else if (command === 'remove-bookmark') {
+        console.log('[YT Bookmarker] Remove bookmark shortcut triggered');
+        try {
+            await chrome.tabs.sendMessage(tab.id, { action: 'trigger-remove-bookmark' });
         } catch (error) {
             console.error('[YT Bookmarker] Error sending message to content script:', error);
         }
@@ -85,6 +118,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Handle bookmark request
         saveBookmark(message.data).then(sendResponse);
         return true; // Keep channel open for async response
+    }
+
+    if (message.action === 'remove-bookmark') {
+        // Handle remove bookmark request
+        removeBookmarkByVideoId(message.videoId).then(sendResponse);
+        return true;
     }
 
     return false;

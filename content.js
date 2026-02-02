@@ -177,6 +177,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendBookmark();
         sendResponse({ success: true });
     }
+
+    if (message.action === 'trigger-remove-bookmark') {
+        const videoId = getVideoId();
+        if (videoId) {
+            chrome.runtime.sendMessage({
+                action: 'remove-bookmark',
+                videoId: videoId
+            }, (response) => {
+                if (response && response.success) {
+                    console.log(`[YT Bookmarker] Removed ${response.removed} bookmark(s)`);
+                }
+            });
+        }
+        sendResponse({ success: true });
+    }
+
     return true; // Keep message channel open for async response
 });
 
