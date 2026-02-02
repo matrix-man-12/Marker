@@ -1,5 +1,5 @@
 /**
- * Utility functions for YouTube Bookmarker extension
+ * Utility functions for Marker extension
  */
 
 /**

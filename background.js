@@ -1,5 +1,5 @@
 /**
- * Background service worker for YouTube Bookmarker
+ * Background service worker for Marker
  * Handles bookmark storage using chrome.storage.local
  */
 
@@ -10,7 +10,7 @@ importScripts('utils.js');
  * Initialize the extension
  */
 async function initialize() {
-    console.log('[YT Bookmarker] Extension initialized');
+    console.log('[Marker] Extension initialized');
 }
 
 /**
@@ -38,7 +38,7 @@ async function saveBookmark(bookmarkData) {
         );
 
         if (isDuplicate) {
-            console.log('[YT Bookmarker] Duplicate bookmark ignored');
+            console.log('[Marker] Duplicate bookmark ignored');
             return { success: true, duplicate: true };
         }
 
@@ -48,11 +48,11 @@ async function saveBookmark(bookmarkData) {
         // Save to storage
         await chrome.storage.local.set({ bookmarks });
 
-        console.log('[YT Bookmarker] Bookmark saved:', bookmark.video_title);
+        console.log('[Marker] Bookmark saved:', bookmark.video_title);
         return { success: true };
 
     } catch (error) {
-        console.error('[YT Bookmarker] Error saving bookmark:', error);
+        console.error('[Marker] Error saving bookmark:', error);
         return { success: false, error: error.message };
     }
 }
@@ -71,16 +71,16 @@ async function removeBookmarkByVideoId(videoId) {
         const removedCount = originalCount - newBookmarks.length;
 
         if (removedCount === 0) {
-            console.log('[YT Bookmarker] No bookmarks found for this video');
+            console.log('[Marker] No bookmarks found for this video');
             return { success: true, removed: 0 };
         }
 
         await chrome.storage.local.set({ bookmarks: newBookmarks });
-        console.log(`[YT Bookmarker] Removed ${removedCount} bookmark(s) for video: ${videoId}`);
+        console.log(`[Marker] Removed ${removedCount} bookmark(s) for video: ${videoId}`);
         return { success: true, removed: removedCount };
 
     } catch (error) {
-        console.error('[YT Bookmarker] Error removing bookmark:', error);
+        console.error('[Marker] Error removing bookmark:', error);
         return { success: false, error: error.message };
     }
 }
@@ -91,23 +91,23 @@ chrome.commands.onCommand.addListener(async (command) => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab || !tab.url || !tab.url.includes('youtube.com')) {
-        console.log('[YT Bookmarker] Not on YouTube page');
+        console.log('[Marker] Not on YouTube page');
         return;
     }
 
     if (command === 'bookmark-video') {
-        console.log('[YT Bookmarker] Bookmark shortcut triggered');
+        console.log('[Marker] Bookmark shortcut triggered');
         try {
             await chrome.tabs.sendMessage(tab.id, { action: 'trigger-bookmark' });
         } catch (error) {
-            console.error('[YT Bookmarker] Error sending message to content script:', error);
+            console.error('[Marker] Error sending message to content script:', error);
         }
     } else if (command === 'remove-bookmark') {
-        console.log('[YT Bookmarker] Remove bookmark shortcut triggered');
+        console.log('[Marker] Remove bookmark shortcut triggered');
         try {
             await chrome.tabs.sendMessage(tab.id, { action: 'trigger-remove-bookmark' });
         } catch (error) {
-            console.error('[YT Bookmarker] Error sending message to content script:', error);
+            console.error('[Marker] Error sending message to content script:', error);
         }
     }
 });
@@ -131,11 +131,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Initialize on install/update
 chrome.runtime.onInstalled.addListener(() => {
-    console.log('[YT Bookmarker] Extension installed/updated');
+    console.log('[Marker] Extension installed/updated');
     initialize();
 });
 
 // Initialize on startup
 initialize();
 
-console.log('[YT Bookmarker] Background service worker loaded');
+console.log('[Marker] Background service worker loaded');

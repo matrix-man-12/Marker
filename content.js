@@ -1,5 +1,5 @@
 /**
- * Content script for YouTube Bookmarker
+ * Content script for Marker
  * Injected on YouTube pages to extract video metadata and timestamps
  */
 
@@ -105,14 +105,14 @@ function extractVideoMetadata() {
     const videoId = getVideoId();
 
     if (!videoId) {
-        console.error('[YT Bookmarker] Could not extract video ID');
+        console.error('[Marker] Could not extract video ID');
         return null;
     }
 
     const timestampSeconds = getCurrentTimestamp();
 
     if (timestampSeconds === null) {
-        console.error('[YT Bookmarker] Could not get current timestamp');
+        console.error('[Marker] Could not get current timestamp');
         return null;
     }
 
@@ -146,11 +146,11 @@ function sendBookmark() {
     const bookmarkData = extractVideoMetadata();
 
     if (!bookmarkData) {
-        console.error('[YT Bookmarker] Failed to extract video metadata');
+        console.error('[Marker] Failed to extract video metadata');
         return;
     }
 
-    console.log('[YT Bookmarker] Sending bookmark:', bookmarkData);
+    console.log('[Marker] Sending bookmark:', bookmarkData);
 
     // Send message to background service worker
     chrome.runtime.sendMessage({
@@ -158,15 +158,15 @@ function sendBookmark() {
         data: bookmarkData
     }, (response) => {
         if (chrome.runtime.lastError) {
-            console.error('[YT Bookmarker] Error sending message:', chrome.runtime.lastError);
+            console.error('[Marker] Error sending message:', chrome.runtime.lastError);
             return;
         }
 
         if (response && response.success) {
-            console.log('[YT Bookmarker] Bookmark saved successfully');
+            console.log('[Marker] Bookmark saved successfully');
             // Optional: Show a subtle visual feedback (e.g., brief icon overlay)
         } else {
-            console.error('[YT Bookmarker] Failed to save bookmark:', response?.error);
+            console.error('[Marker] Failed to save bookmark:', response?.error);
         }
     });
 }
@@ -186,7 +186,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 videoId: videoId
             }, (response) => {
                 if (response && response.success) {
-                    console.log(`[YT Bookmarker] Removed ${response.removed} bookmark(s)`);
+                    console.log(`[Marker] Removed ${response.removed} bookmark(s)`);
                 }
             });
         }
@@ -196,4 +196,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open for async response
 });
 
-console.log('[YT Bookmarker] Content script loaded');
+console.log('[Marker] Content script loaded');

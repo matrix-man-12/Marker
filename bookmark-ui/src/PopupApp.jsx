@@ -99,7 +99,7 @@ function PopupApp() {
         <div className="popup-container">
             {/* Header */}
             <header className="popup-header">
-                <h1>YT Bookmarker</h1>
+                <h1>Marker</h1>
             </header>
 
             {/* Current Video Section - Only shown on YouTube videos */}

@@ -1,5 +1,5 @@
 /**
- * Popup script for YouTube Bookmarker
+ * Popup script for Marker
  * Displays bookmark stats and recent bookmarks
  */
 
@@ -90,7 +90,7 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
 // Listen for storage changes (real-time updates)
 chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'local' && changes.bookmarks) {
-        console.log('[YT Bookmarker] Bookmarks updated, refreshing popup...');
+        console.log('[Marker] Bookmarks updated, refreshing popup...');
         loadBookmarks();
     }
 });

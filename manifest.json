@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Bookmarker",
+  "name": "Marker",
   "version": "1.0.0",
   "description": "Bookmark YouTube videos at specific timestamps with a keyboard shortcut. Search and manage bookmarks with ease.",
   "permissions": [
