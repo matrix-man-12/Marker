@@ -14,7 +14,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "bookmarks-page/popup.html",
     "default_icon": "icons/icon128.png"
   },
   "content_scripts": [
