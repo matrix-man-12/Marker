@@ -1,9 +1,20 @@
+import { useEffect } from 'react';
 import './ConfirmModal.css';
 
 /**
  * InfoModal - For displaying information/results (single button)
  */
 export function InfoModal({ isOpen, title, message, buttonText, onClose, variant }) {
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     return (
