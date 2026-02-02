@@ -89,9 +89,9 @@ function PopupApp() {
         chrome.tabs.create({ url });
     };
 
-    // Get recent 3 bookmarks (excluding current video)
+    // Get recent 3 unwatched bookmarks (excluding current video)
     const recentBookmarks = [...bookmarks]
-        .filter(b => b.video_id !== currentVideoId)
+        .filter(b => b.video_id !== currentVideoId && !b.watched)
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .slice(0, 3);
 

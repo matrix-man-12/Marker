@@ -4,6 +4,7 @@ import { StatsBar } from './components/StatsBar';
 import { BookmarkGrid } from './components/BookmarkGrid';
 import { BulkActionBar } from './components/BulkActionBar';
 import { ConfirmModal } from './components/ConfirmModal';
+import { InfoModal } from './components/InfoModal';
 import { useBookmarks } from './hooks/useBookmarks';
 import { exportToCSV, parseCSV } from './utils/csv';
 import './App.css';
@@ -35,6 +36,14 @@ function App() {
     confirmText: '',
     onConfirm: null,
     variant: 'danger'
+  });
+
+  // Info modal state (for import results)
+  const [infoModal, setInfoModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'success'
   });
 
   // Set initial theme on mount
@@ -123,9 +132,19 @@ function App() {
     try {
       const newBookmarks = await parseCSV(file);
       const result = await importBookmarks(newBookmarks);
-      alert(result.message);
+      setInfoModal({
+        isOpen: true,
+        title: 'Import Successful',
+        message: result.message,
+        variant: 'success'
+      });
     } catch (error) {
-      alert('Error importing CSV: ' + error.message);
+      setInfoModal({
+        isOpen: true,
+        title: 'Import Failed',
+        message: 'Error importing CSV: ' + error.message,
+        variant: 'danger'
+      });
     }
   };
 
@@ -186,6 +205,14 @@ function App() {
         variant={modalConfig.variant}
         onConfirm={modalConfig.onConfirm}
         onCancel={closeModal}
+      />
+
+      <InfoModal
+        isOpen={infoModal.isOpen}
+        title={infoModal.title}
+        message={infoModal.message}
+        variant={infoModal.variant}
+        onClose={() => setInfoModal(prev => ({ ...prev, isOpen: false }))}
       />
     </div>
   );

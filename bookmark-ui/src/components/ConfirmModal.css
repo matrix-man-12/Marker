@@ -104,3 +104,17 @@
     background: #dc2626;
     border-color: #dc2626;
 }
+
+.modal-btn-confirm.success {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+
+.modal-btn-confirm.success:hover {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+.modal-actions-single {
+    justify-content: flex-end;
+}
