@@ -6,3 +6,4 @@ export { SortDropdown } from './SortDropdown';
 export { BookmarkCard } from './BookmarkCard';
 export { BookmarkGrid } from './BookmarkGrid';
 export { ThemeToggle } from './ThemeToggle';
+export { TabBar } from './TabBar';

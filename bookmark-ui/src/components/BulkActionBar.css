@@ -3,7 +3,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--bg-card);
+    background: rgba(var(--bulk-bar-rgb, 28, 33, 40), 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border-color);
     padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
@@ -34,13 +36,13 @@
 }
 
 .selected-count {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-primary);
     background: var(--accent-primary);
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: var(--radius-full);
     color: white;
+    letter-spacing: 0.02em;
 }
 
 .bulk-action-buttons {
@@ -103,6 +105,29 @@
 
 .bulk-btn-cancel:hover {
     color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.bulk-btn-select-all {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.bulk-btn-select-all:hover {
+    background: var(--badge-bg);
+}
+
+.bulk-btn-select-all.all-selected {
+    background: var(--badge-bg);
+}
+
+.bulk-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.bulk-btn:disabled:hover {
+    transform: none;
     background: var(--bg-secondary);
 }
 

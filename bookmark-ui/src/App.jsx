@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
+import { TabBar } from './components/TabBar';
 import { StatsBar } from './components/StatsBar';
 import { BookmarkGrid } from './components/BookmarkGrid';
 import { BulkActionBar } from './components/BulkActionBar';
@@ -23,6 +24,9 @@ function App() {
     bulkSetWatched,
     bulkDelete
   } = useBookmarks();
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState('unwatched');
 
   // Selection state
   const [selectionMode, setSelectionMode] = useState(false);
@@ -52,6 +56,24 @@ function App() {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
+  // Tab counts (computed from filtered bookmarks, i.e. after search)
+  const tabCounts = useMemo(() => {
+    const watched = filteredBookmarks.filter(b => b.watched).length;
+    const unwatched = filteredBookmarks.filter(b => !b.watched).length;
+    return {
+      all: filteredBookmarks.length,
+      watched,
+      unwatched,
+    };
+  }, [filteredBookmarks]);
+
+  // Bookmarks to display based on active tab
+  const displayedBookmarks = useMemo(() => {
+    if (activeTab === 'watched') return filteredBookmarks.filter(b => b.watched);
+    if (activeTab === 'unwatched') return filteredBookmarks.filter(b => !b.watched);
+    return filteredBookmarks;
+  }, [filteredBookmarks, activeTab]);
+
   const closeModal = () => {
     setModalConfig(prev => ({ ...prev, isOpen: false }));
   };
@@ -74,6 +96,15 @@ function App() {
       }
       return newSet;
     });
+  };
+
+  const handleSelectAll = () => {
+    const allIds = new Set(displayedBookmarks.map(b => b.id));
+    setSelectedIds(allIds);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedIds(new Set());
   };
 
   const handleBulkMarkWatched = async () => {
@@ -169,17 +200,22 @@ function App() {
       />
 
       <main className="main-content">
+        <TabBar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          counts={tabCounts}
+        />
+
         <StatsBar
-          total={bookmarks.length}
-          showing={filteredBookmarks.length}
           sortOption={sortOption}
           onSortChange={setSortOption}
           selectionMode={selectionMode}
           onToggleSelectionMode={handleToggleSelectionMode}
         />
 
+
         <BookmarkGrid
-          bookmarks={filteredBookmarks}
+          bookmarks={displayedBookmarks}
           onDelete={handleSingleDeleteRequest}
           selectionMode={selectionMode}
           selectedIds={selectedIds}
@@ -190,6 +226,9 @@ function App() {
       {selectionMode && (
         <BulkActionBar
           selectedCount={selectedIds.size}
+          totalCount={displayedBookmarks.length}
+          onSelectAll={handleSelectAll}
+          onDeselectAll={handleDeselectAll}
           onMarkWatched={handleBulkMarkWatched}
           onMarkUnwatched={handleBulkMarkUnwatched}
           onDelete={handleBulkDeleteRequest}
