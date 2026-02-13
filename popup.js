@@ -62,7 +62,7 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     }
 
     // Create CSV content (load utils for this)
-    let csv = 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at\n';
+    let csv = 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at,watched\n';
 
     bookmarks.forEach(b => {
         const row = [
@@ -72,7 +72,8 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
             b.timestamp_seconds,
             b.timestamp_hh_mm_ss,
             b.video_url,
-            b.created_at
+            b.created_at,
+            b.watched ? 'true' : 'false'
         ].join(',');
         csv += row + '\n';
     });

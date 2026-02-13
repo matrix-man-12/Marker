@@ -150,13 +150,17 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
 
             {/* Footer */}
             <div className="card-footer">
-                <button className="timestamp-badge" onClick={handleTimestampClick} title="Jump to timestamp">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    {bookmark.timestamp_hh_mm_ss}
-                </button>
+                {bookmark.timestamp_seconds < 10 ? (
+                    <span className="timestamp-badge">start</span>
+                ) : (
+                    <button className="timestamp-badge" onClick={handleTimestampClick} title="Jump to timestamp">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        {bookmark.timestamp_hh_mm_ss}
+                    </button>
+                )}
 
                 {!selectionMode && (
                     <button className="delete-btn" onClick={handleDelete} title="Delete bookmark">

@@ -1,7 +1,43 @@
 import { BookmarkCard } from './BookmarkCard';
 import './BookmarkGrid.css';
 
-export function BookmarkGrid({ bookmarks, onDelete, selectionMode, selectedIds, onSelect }) {
+/**
+ * Group bookmarks by date (Today, Yesterday, or formatted date)
+ */
+function groupBookmarksByDate(bookmarks) {
+    const groups = {};
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    bookmarks.forEach(bookmark => {
+        const date = new Date(bookmark.created_at);
+        const bookmarkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+        let label;
+        if (bookmarkDate.getTime() === today.getTime()) {
+            label = 'Today';
+        } else if (bookmarkDate.getTime() === yesterday.getTime()) {
+            label = 'Yesterday';
+        } else {
+            label = bookmarkDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: bookmarkDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+            });
+        }
+
+        if (!groups[label]) {
+            groups[label] = [];
+        }
+        groups[label].push(bookmark);
+    });
+
+    return Object.entries(groups);
+}
+
+export function BookmarkGrid({ bookmarks, onDelete, selectionMode, selectedIds, onSelect, groupByDate }) {
     if (bookmarks.length === 0) {
         return (
             <div className="empty-state">
@@ -14,6 +50,34 @@ export function BookmarkGrid({ bookmarks, onDelete, selectionMode, selectedIds, 
                 <p className="empty-text">
                     Try adjusting your search or add bookmarks on YouTube with <kbd>Ctrl+Shift+L</kbd>
                 </p>
+            </div>
+        );
+    }
+
+    if (groupByDate) {
+        const groups = groupBookmarksByDate(bookmarks);
+        return (
+            <div className="bookmark-grid-grouped">
+                {groups.map(([dateLabel, groupBookmarks]) => (
+                    <div key={dateLabel} className="date-group">
+                        <div className="date-separator">
+                            <span className="date-label">{dateLabel}</span>
+                            <span className="date-count">{groupBookmarks.length}</span>
+                        </div>
+                        <div className="bookmark-grid">
+                            {groupBookmarks.map(bookmark => (
+                                <BookmarkCard
+                                    key={bookmark.id}
+                                    bookmark={bookmark}
+                                    onDelete={onDelete}
+                                    selectionMode={selectionMode}
+                                    isSelected={selectedIds.has(bookmark.id)}
+                                    onSelect={onSelect}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
         );
     }

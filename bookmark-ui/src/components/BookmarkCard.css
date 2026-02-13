@@ -5,6 +5,7 @@
     cursor: pointer;
     transition: all var(--transition-normal);
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card, none);
     position: relative;
 }
 
@@ -105,14 +106,7 @@
     letter-spacing: 0.5px;
 }
 
-/* Watched Card State */
-.bookmark-card.watched {
-    opacity: 0.7;
-}
-
-.bookmark-card.watched:hover {
-    opacity: 1;
-}
+/* Watched Card State - no opacity change since watched/unwatched are separate views */
 
 /* Channel Info */
 .card-channel {

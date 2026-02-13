@@ -84,6 +84,18 @@
     background: rgba(239, 68, 68, 0.1);
 }
 
+.sync-btn {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.sync-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
 .watched-btn {
     background: transparent;
     border-color: var(--border-color);

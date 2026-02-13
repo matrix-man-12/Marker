@@ -50,7 +50,7 @@ export function exportToCSV(bookmarks) {
         return;
     }
 
-    const header = 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at,video_duration_seconds';
+    const header = 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at,video_duration_seconds,watched';
 
     const rows = bookmarks.map(b => {
         return [
@@ -61,7 +61,8 @@ export function exportToCSV(bookmarks) {
             escapeCSV(b.timestamp_hh_mm_ss),
             escapeCSV(b.video_url),
             escapeCSV(b.created_at),
-            escapeCSV(b.video_duration_seconds || '')
+            escapeCSV(b.video_duration_seconds || ''),
+            escapeCSV(b.watched ? 'true' : 'false')
         ].join(',');
     });
 
@@ -102,7 +103,7 @@ export function parseCSV(file) {
                 const dataLines = lines.slice(1).filter(line => line.trim());
 
                 const bookmarks = dataLines.map(line => {
-                    const [video_id, video_title, channel_name, timestamp_seconds, timestamp_hh_mm_ss, video_url, created_at, video_duration_seconds] = parseCSVLine(line);
+                    const [video_id, video_title, channel_name, timestamp_seconds, timestamp_hh_mm_ss, video_url, created_at, video_duration_seconds, watched] = parseCSVLine(line);
 
                     return {
                         id: generateUUID(),
@@ -113,7 +114,8 @@ export function parseCSV(file) {
                         timestamp_hh_mm_ss,
                         video_url,
                         created_at,
-                        video_duration_seconds: video_duration_seconds ? parseInt(video_duration_seconds) : null
+                        video_duration_seconds: video_duration_seconds ? parseInt(video_duration_seconds) : null,
+                        watched: watched === 'true'
                     };
                 });
 

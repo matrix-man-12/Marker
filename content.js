@@ -193,7 +193,45 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: true });
     }
 
-    return true; // Keep message channel open for async response
+    if (message.action === 'trigger-sync-bookmark') {
+        const videoId = getVideoId();
+        const timestampSeconds = getCurrentTimestamp();
+        if (videoId && timestampSeconds !== null) {
+            const timestampFormatted = formatTimestamp(timestampSeconds);
+            const videoUrl = `https://www.youtube.com/watch?v=${videoId}&t=${timestampSeconds}s`;
+            chrome.runtime.sendMessage({
+                action: 'sync-bookmark',
+                videoId: videoId,
+                timestampSeconds: timestampSeconds,
+                timestampFormatted: timestampFormatted,
+                videoUrl: videoUrl
+            }, (response) => {
+                if (response && response.success) {
+                    console.log(`[Marker] Synced bookmark timestamp to ${timestampFormatted}`);
+                } else {
+                    console.log('[Marker] No bookmark found to sync');
+                }
+            });
+        }
+        sendResponse({ success: true });
+    }
+
+    if (message.action === 'trigger-mark-watched') {
+        const videoId = getVideoId();
+        if (videoId) {
+            chrome.runtime.sendMessage({
+                action: 'mark-watched',
+                videoId: videoId
+            }, (response) => {
+                if (response && response.success) {
+                    console.log(`[Marker] Marked video as watched (${response.updated} bookmark(s))`);
+                }
+            });
+        }
+        sendResponse({ success: true });
+    }
+
+    return true;
 });
 
 console.log('[Marker] Content script loaded');

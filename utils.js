@@ -59,7 +59,8 @@ function createCSVRow(data) {
     data.timestamp_seconds,
     data.timestamp_hh_mm_ss,
     data.video_url,
-    data.created_at
+    data.created_at,
+    data.watched ? 'true' : 'false'
   ];
 
   return fields.map(escapeCSV).join(',');
@@ -70,7 +71,7 @@ function createCSVRow(data) {
  * @returns {string} - CSV header string
  */
 function getCSVHeader() {
-  return 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at';
+  return 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at,watched';
 }
 
 /**

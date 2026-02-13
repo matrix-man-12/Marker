@@ -28,6 +28,9 @@ function App() {
   // Tab state
   const [activeTab, setActiveTab] = useState('unwatched');
 
+  // Group by date toggle
+  const [groupByDate, setGroupByDate] = useState(false);
+
   // Selection state
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -211,6 +214,8 @@ function App() {
           onSortChange={setSortOption}
           selectionMode={selectionMode}
           onToggleSelectionMode={handleToggleSelectionMode}
+          groupByDate={groupByDate}
+          onToggleGroupByDate={() => setGroupByDate(!groupByDate)}
         />
 
 
@@ -220,6 +225,7 @@ function App() {
           selectionMode={selectionMode}
           selectedIds={selectedIds}
           onSelect={handleSelect}
+          groupByDate={groupByDate}
         />
       </main>
 

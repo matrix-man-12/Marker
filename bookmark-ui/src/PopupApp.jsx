@@ -79,6 +79,18 @@ function PopupApp() {
         }
     };
 
+    // Sync bookmark timestamp to current playback position
+    const handleSyncTimestamp = async () => {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab) {
+            try {
+                await chrome.tabs.sendMessage(tab.id, { action: 'trigger-sync-bookmark' });
+            } catch (error) {
+                console.error('Error syncing bookmark:', error);
+            }
+        }
+    };
+
     // View all bookmarks
     const handleViewAll = () => {
         chrome.tabs.create({ url: chrome.runtime.getURL('bookmarks-page/index.html') });
@@ -124,6 +136,14 @@ function PopupApp() {
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                     </svg>
                                     Remove
+                                </button>
+                                <button className="action-btn sync-btn" onClick={handleSyncTimestamp} title="Update bookmark to current timestamp">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <polyline points="23 4 23 10 17 10"></polyline>
+                                        <polyline points="1 20 1 14 7 14"></polyline>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                    </svg>
+                                    Sync
                                 </button>
                                 <button
                                     className={`action-btn watched-btn ${isCurrentVideoWatched ? 'is-watched' : ''}`}

@@ -43,6 +43,20 @@
         "mac": "Command+Shift+K"
       },
       "description": "Remove bookmark for current YouTube video"
+    },
+    "sync-bookmark": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Comma",
+        "mac": "Command+Shift+Comma"
+      },
+      "description": "Sync bookmark timestamp to current playback position"
+    },
+    "mark-watched": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Period",
+        "mac": "Command+Shift+Period"
+      },
+      "description": "Mark current video as watched"
     }
   },
   "icons": {
