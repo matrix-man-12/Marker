@@ -12,6 +12,20 @@
   padding: var(--spacing-lg);
 }
 
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  position: sticky;
+  top: 65px;
+  z-index: 50;
+  background: var(--bg-primary);
+  padding: var(--spacing-sm) 0;
+  margin-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
 /* Loading State */
 .loading {
   display: flex;

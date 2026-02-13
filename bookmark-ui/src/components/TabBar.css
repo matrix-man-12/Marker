@@ -1,7 +1,4 @@
-.tab-bar {
-    margin-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
-}
+.tab-bar {}
 
 .tab-bar-inner {
     display: flex;

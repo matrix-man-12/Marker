@@ -203,20 +203,21 @@ function App() {
       />
 
       <main className="main-content">
-        <TabBar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          counts={tabCounts}
-        />
-
-        <StatsBar
-          sortOption={sortOption}
-          onSortChange={setSortOption}
-          selectionMode={selectionMode}
-          onToggleSelectionMode={handleToggleSelectionMode}
-          groupByDate={groupByDate}
-          onToggleGroupByDate={() => setGroupByDate(!groupByDate)}
-        />
+        <div className="toolbar-row">
+          <TabBar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            counts={tabCounts}
+          />
+          <StatsBar
+            sortOption={sortOption}
+            onSortChange={setSortOption}
+            selectionMode={selectionMode}
+            onToggleSelectionMode={handleToggleSelectionMode}
+            groupByDate={groupByDate}
+            onToggleGroupByDate={() => setGroupByDate(!groupByDate)}
+          />
+        </div>
 
 
         <BookmarkGrid

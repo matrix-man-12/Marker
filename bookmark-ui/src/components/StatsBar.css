@@ -4,12 +4,6 @@
     justify-content: flex-end;
     flex-wrap: wrap;
     gap: var(--spacing-md);
-    padding: var(--spacing-md) 0 var(--spacing-sm) 0;
-    margin-bottom: var(--spacing-sm);
-    position: sticky;
-    top: 65px;
-    z-index: 50;
-    background: var(--bg-primary);
 }
 
 .stats-right {
