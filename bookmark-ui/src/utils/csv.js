@@ -50,7 +50,7 @@ export function exportToCSV(bookmarks) {
         return;
     }
 
-    const header = 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at,video_duration_seconds,watched';
+    const header = 'video_id,video_title,channel_name,timestamp_seconds,timestamp_hh_mm_ss,video_url,created_at,video_duration_seconds,watched,playlist_id,playlist_title,playlist_index';
 
     const rows = bookmarks.map(b => {
         return [
@@ -62,7 +62,10 @@ export function exportToCSV(bookmarks) {
             escapeCSV(b.video_url),
             escapeCSV(b.created_at),
             escapeCSV(b.video_duration_seconds || ''),
-            escapeCSV(b.watched ? 'true' : 'false')
+            escapeCSV(b.watched ? 'true' : 'false'),
+            escapeCSV(b.playlist_id || ''),
+            escapeCSV(b.playlist_title || ''),
+            escapeCSV(b.playlist_index || '')
         ].join(',');
     });
 
@@ -103,9 +106,10 @@ export function parseCSV(file) {
                 const dataLines = lines.slice(1).filter(line => line.trim());
 
                 const bookmarks = dataLines.map(line => {
-                    const [video_id, video_title, channel_name, timestamp_seconds, timestamp_hh_mm_ss, video_url, created_at, video_duration_seconds, watched] = parseCSVLine(line);
+                    const fields = parseCSVLine(line);
+                    const [video_id, video_title, channel_name, timestamp_seconds, timestamp_hh_mm_ss, video_url, created_at, video_duration_seconds, watched, playlist_id, playlist_title, playlist_index] = fields;
 
-                    return {
+                    const bookmark = {
                         id: generateUUID(),
                         video_id,
                         video_title: video_title.replace(/^"|"$/g, '').replace(/""/g, '"'),
@@ -117,6 +121,15 @@ export function parseCSV(file) {
                         video_duration_seconds: video_duration_seconds ? parseInt(video_duration_seconds) : null,
                         watched: watched === 'true'
                     };
+
+                    // Add playlist fields if present
+                    if (playlist_id) {
+                        bookmark.playlist_id = playlist_id;
+                        bookmark.playlist_title = playlist_title ? playlist_title.replace(/^"|"$/g, '').replace(/""/g, '"') : null;
+                        bookmark.playlist_index = playlist_index ? parseInt(playlist_index) : null;
+                    }
+
+                    return bookmark;
                 });
 
                 resolve(bookmarks);

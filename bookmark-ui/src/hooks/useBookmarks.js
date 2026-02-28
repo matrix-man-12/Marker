@@ -59,7 +59,8 @@ export function useBookmarks() {
             result = result.filter(b =>
                 b.video_title?.toLowerCase().includes(query) ||
                 b.channel_name?.toLowerCase().includes(query) ||
-                b.video_id?.toLowerCase().includes(query)
+                b.video_id?.toLowerCase().includes(query) ||
+                b.playlist_title?.toLowerCase().includes(query)
             );
         }
 

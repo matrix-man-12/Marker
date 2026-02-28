@@ -48,7 +48,7 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
     const thumbnailUrl = `https://i.ytimg.com/vi/${bookmark.video_id}/mqdefault.jpg`;
 
     // URL without timestamp - starts video from beginning
-    const videoUrlFromStart = `https://www.youtube.com/watch?v=${bookmark.video_id}`;
+    const videoUrlFromStart = `https://www.youtube.com/watch?v=${bookmark.video_id}${bookmark.playlist_id ? `&list=${bookmark.playlist_id}` : ''}${bookmark.playlist_index ? `&index=${bookmark.playlist_index}` : ''}`;
 
     // URL with timestamp - starts video at bookmarked time
     const videoUrlWithTimestamp = bookmark.video_url;
@@ -57,6 +57,13 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
         e.stopPropagation();
         if (!selectionMode) {
             window.open(videoUrlWithTimestamp, '_blank');
+        }
+    };
+
+    const handlePlaylistClick = (e) => {
+        e.stopPropagation();
+        if (!selectionMode && bookmark.playlist_id) {
+            window.open(videoUrlFromStart, '_blank');
         }
     };
 
@@ -150,9 +157,7 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
 
             {/* Footer */}
             <div className="card-footer">
-                {bookmark.timestamp_seconds < 10 ? (
-                    <span className="timestamp-badge">start</span>
-                ) : (
+                {(!bookmark.playlist_id && bookmark.timestamp_seconds >= 10) && (
                     <button className="timestamp-badge" onClick={handleTimestampClick} title="Jump to timestamp">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -161,6 +166,22 @@ export function BookmarkCard({ bookmark, onDelete, selectionMode, isSelected, on
                         {bookmark.timestamp_hh_mm_ss}
                     </button>
                 )}
+
+                {bookmark.playlist_id && (
+                    <button className="playlist-badge" onClick={handlePlaylistClick} title={bookmark.playlist_title || 'Open playlist'}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        {bookmark.playlist_title || 'Playlist'}
+                    </button>
+                )}
+
+                <div className="card-footer-spacer"></div>
 
                 {!selectionMode && (
                     <button className="delete-btn" onClick={handleDelete} title="Delete bookmark">

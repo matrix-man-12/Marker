@@ -29,8 +29,42 @@ async function saveBookmark(bookmarkData) {
 
         // Get existing bookmarks
         const result = await chrome.storage.local.get('bookmarks');
-        const bookmarks = result.bookmarks || [];
+        let bookmarks = result.bookmarks || [];
 
+        // --- Playlist-aware save logic ---
+        if (bookmark.playlist_id) {
+            // Case 1: Same playlist_id exists → replace (resume-position tracker)
+            const existingPlaylistIdx = bookmarks.findIndex(
+                b => b.playlist_id === bookmark.playlist_id
+            );
+
+            if (existingPlaylistIdx !== -1) {
+                console.log('[Marker] Replacing playlist bookmark (resume position)');
+                bookmarks[existingPlaylistIdx] = bookmark;
+                await chrome.storage.local.set({ bookmarks });
+                return { success: true, replaced: true };
+            }
+
+            // Case 2: Same video_id exists as regular bookmark → upgrade to playlist
+            const existingRegularIdx = bookmarks.findIndex(
+                b => b.video_id === bookmark.video_id && !b.playlist_id
+            );
+
+            if (existingRegularIdx !== -1) {
+                console.log('[Marker] Upgrading regular bookmark to playlist bookmark');
+                bookmarks[existingRegularIdx] = bookmark;
+                await chrome.storage.local.set({ bookmarks });
+                return { success: true, upgraded: true };
+            }
+
+            // Case 3: New playlist bookmark
+            bookmarks.push(bookmark);
+            await chrome.storage.local.set({ bookmarks });
+            console.log('[Marker] Playlist bookmark saved:', bookmark.video_title);
+            return { success: true };
+        }
+
+        // --- Regular (non-playlist) save logic ---
         // Check for duplicate (same video + timestamp)
         const isDuplicate = bookmarks.some(b =>
             b.video_id === bookmark.video_id &&

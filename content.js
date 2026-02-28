@@ -13,7 +13,7 @@ function getVideoId() {
 
     // Also check for embedded videos or shorts
     if (!videoId) {
-        const pathMatch = window.location.pathname.match(/\/(?:embed|shorts)\/([a-zA-Z0-9_-]+)/);
+    const pathMatch = window.location.pathname.match(/\/(?:embed|shorts)\/([a-zA-Z0-9_-]+)/);
         return pathMatch ? pathMatch[1] : null;
     }
 
@@ -61,6 +61,42 @@ function getChannelUrl() {
         document.querySelector('#channel-name a');
 
     return channelLink ? channelLink.href : null;
+}
+
+/**
+ * Get playlist ID from current URL (if watching within a playlist)
+ * @returns {string|null} - Playlist ID or null if not in a playlist
+ */
+function getPlaylistId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('list') || null;
+}
+
+/**
+ * Get playlist title from the page (if watching within a playlist)
+ * @returns {string|null} - Playlist title or null if not found
+ */
+function getPlaylistTitle() {
+    // Try selectors for the playlist title in the sidebar panel
+    // ytd-playlist-panel-renderer #title works for Mix and regular playlists
+    const titleElement =
+        document.querySelector('ytd-playlist-panel-renderer .title') ||
+        document.querySelector('ytd-playlist-panel-renderer .header .title') ||
+        document.querySelector('ytd-playlist-panel-renderer .header-description .title') ||
+        document.querySelector('ytd-playlist-header-renderer h1 yt-formatted-string');
+
+    console.log(titleElement.textContent);
+    return titleElement ? titleElement.textContent.trim() : null;
+}
+
+/**
+ * Get playlist index/position from current URL
+ * @returns {number|null} - Index or null if not found
+ */
+function getPlaylistIndex() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const index = urlParams.get('index');
+    return index ? parseInt(index) : null;
 }
 
 /**
@@ -125,6 +161,10 @@ function extractVideoMetadata() {
     const createdAt = formatISODateTime();
     const videoDuration = getVideoDuration();
 
+    const playlistId = getPlaylistId();
+    const playlistTitle = getPlaylistTitle();
+    const playlistIndex = getPlaylistIndex();
+
     return {
         video_id: videoId,
         video_title: videoTitle,
@@ -135,7 +175,10 @@ function extractVideoMetadata() {
         timestamp_hh_mm_ss: timestampFormatted,
         video_url: videoUrl,
         created_at: createdAt,
-        video_duration_seconds: videoDuration
+        video_duration_seconds: videoDuration,
+        playlist_id: playlistId,
+        playlist_title: playlistTitle,
+        playlist_index: playlistIndex
     };
 }
 
