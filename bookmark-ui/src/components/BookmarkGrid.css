@@ -46,8 +46,48 @@
 }
 
 /* Reset padding when grid is inside a group */
-.date-group .bookmark-grid {
+.date-group .bookmark-grid,
+.playlist-group .bookmark-grid,
+.playlist-subgroup .bookmark-grid {
     padding-bottom: 0;
+}
+
+/* Playlist group (standalone) */
+.playlist-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* Playlist subgroups (nested inside date groups) */
+.playlist-subgroups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+}
+
+.playlist-subgroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.playlist-separator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+}
+
+.playlist-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
 }
 
 /* Empty State */

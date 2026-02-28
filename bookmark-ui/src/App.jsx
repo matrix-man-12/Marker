@@ -31,6 +31,9 @@ function App() {
   // Group by date toggle
   const [groupByDate, setGroupByDate] = useState(false);
 
+  // Filter by playlist toggle
+  const [filterByPlaylist, setFilterByPlaylist] = useState(false);
+
   // Selection state
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -59,23 +62,31 @@ function App() {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
-  // Tab counts (computed from filtered bookmarks, i.e. after search)
+  // Tab counts (computed from filtered bookmarks, respecting playlist filter)
   const tabCounts = useMemo(() => {
-    const watched = filteredBookmarks.filter(b => b.watched).length;
-    const unwatched = filteredBookmarks.filter(b => !b.watched).length;
+    const base = filterByPlaylist ? filteredBookmarks.filter(b => b.playlist_id) : filteredBookmarks;
+    const watched = base.filter(b => b.watched).length;
+    const unwatched = base.filter(b => !b.watched).length;
     return {
-      all: filteredBookmarks.length,
+      all: base.length,
       watched,
       unwatched,
     };
-  }, [filteredBookmarks]);
+  }, [filteredBookmarks, filterByPlaylist]);
 
-  // Bookmarks to display based on active tab
+  // Bookmarks to display based on active tab + playlist filter
   const displayedBookmarks = useMemo(() => {
-    if (activeTab === 'watched') return filteredBookmarks.filter(b => b.watched);
-    if (activeTab === 'unwatched') return filteredBookmarks.filter(b => !b.watched);
-    return filteredBookmarks;
-  }, [filteredBookmarks, activeTab]);
+    let result = filteredBookmarks;
+
+    // Tab filter
+    if (activeTab === 'watched') result = result.filter(b => b.watched);
+    else if (activeTab === 'unwatched') result = result.filter(b => !b.watched);
+
+    // Playlist filter
+    if (filterByPlaylist) result = result.filter(b => b.playlist_id);
+
+    return result;
+  }, [filteredBookmarks, activeTab, filterByPlaylist]);
 
   const closeModal = () => {
     setModalConfig(prev => ({ ...prev, isOpen: false }));
@@ -216,6 +227,8 @@ function App() {
             onToggleSelectionMode={handleToggleSelectionMode}
             groupByDate={groupByDate}
             onToggleGroupByDate={() => setGroupByDate(!groupByDate)}
+            filterByPlaylist={filterByPlaylist}
+            onToggleFilterByPlaylist={() => setFilterByPlaylist(!filterByPlaylist)}
           />
         </div>
 
